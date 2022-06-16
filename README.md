@@ -5,4 +5,4 @@
 - [Docker compose](https://docs.docker.com/compose/install/)
 
 ## Start
-`docker-compose up --build`
+`bash start.sh`
