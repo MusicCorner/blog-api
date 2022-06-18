@@ -15,12 +15,17 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: postreg
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: blog
+    # command: "CREATE DATABASE blog"
+    expose:
+      - 5433
     ports:
-      - '5431:5431'
-    volumes: 
+      - '5433:5432'
+    volumes:
       - db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   db:

@@ -6,3 +6,6 @@
 
 ## Start
 `bash start.sh`
+
+## Development
+After changing entities (typeorm models) - generatde migrations with `yarn migration:generate` in docker web (node js) container and run those migrations with `yarn migration:run`

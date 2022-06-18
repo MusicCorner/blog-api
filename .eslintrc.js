@@ -3,16 +3,18 @@ module.exports = {
   plugins: ["@typescript-eslint", "prettier"],
   rules: {
     "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/no-empty-function": "off",
     "import/prefer-default-export": "off",
     "import/no-extraneous-dependencies": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off",
     "no-underscore-dangle": "off",
-    "@typescript-eslint/naming-convention": "off",
+    "class-methods-use-this": "off",
+    quotes: [2, "single"],
     "prettier/prettier": [
       "error",
       { singleQuote: true }
     ],
-    quotes: [2, "single"],
     "import/order": [
       'error',
       {
