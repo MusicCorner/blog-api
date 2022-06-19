@@ -6,8 +6,11 @@ import {
   HttpStatus,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
+
+import { AuthJwtGuard } from '@auth/auth.jwt-guard';
 
 import { CreatePostDto } from './create-post.dto';
 import { PostsService } from './posts.service';
@@ -16,15 +19,16 @@ import { PostsService } from './posts.service';
 export class PostsController {
   constructor(private postsService: PostsService) {}
 
+  @UseGuards(AuthJwtGuard)
   @Get()
   getAllPosts() {
     // @Req() req: Request<unknown, unknown, unknown, { test: string }>
     // const queryParams = req.query;
 
     return this.postsService.findAll();
-    // return [{ id: 1, text: 'test' }];
   }
 
+  @UseGuards(AuthJwtGuard)
   @Post()
   async create(@Body() createPostDto: CreatePostDto, @Res() res: Response) {
     try {

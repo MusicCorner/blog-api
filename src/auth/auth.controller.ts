@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common';
 import { Request as ExpressReqeust } from 'express';
 
-import { AuthLocalGuard } from './auth.local.guard';
+import { Auth } from './auth.entity';
+import { AuthLocalGuard } from './auth.local-guard';
 import { AuthRegistrationDto } from './auth.registerDto';
 import { AuthService } from './auth.service';
 
@@ -20,7 +21,7 @@ export class AuthController {
   @UseGuards(AuthLocalGuard)
   @Post('/auth/signin')
   signIn(@Request() req: ExpressReqeust) {
-    return req.user;
+    return this.authService.login(req.user as Auth);
   }
 
   @Post('/auth/signup')

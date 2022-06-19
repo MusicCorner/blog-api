@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 import { User } from '@users/user.entity';
 
@@ -12,7 +13,8 @@ import { AuthRegistrationDto } from './auth.registerDto';
 export class AuthService {
   constructor(
     @InjectRepository(Auth) private authRepository: Repository<Auth>,
-    @InjectRepository(User) private userRepository: Repository<User>
+    @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService
   ) {}
 
   validateUser(authData: AuthLoginDto) {
@@ -20,6 +22,15 @@ export class AuthService {
       where: authData,
       relations: ['user'],
     });
+  }
+
+  login(authData: Auth) {
+    return {
+      access_token: this.jwtService.sign({
+        login: authData.login,
+        id: authData.id,
+      }),
+    };
   }
 
   registerUser(registrationData: AuthRegistrationDto) {

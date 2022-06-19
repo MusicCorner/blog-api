@@ -6,6 +6,6 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN yarn
 COPY . .
-RUN yarn migration:run
+# RUN yarn migration:run
 EXPOSE 3000
 CMD yarn start:dev
