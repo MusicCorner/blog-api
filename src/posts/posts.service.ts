@@ -13,7 +13,7 @@ export class PostsService {
   ) {}
 
   async create(post: CreatePostDto) {
-    const postEntity = Post.create();
+    const postEntity = this.postsRepository.create();
 
     postEntity.content = post.content;
     postEntity.title = post.title;

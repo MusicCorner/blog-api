@@ -6,8 +6,17 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/naming-convention": "off",
     "@typescript-eslint/no-empty-function": "off",
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      { 
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      },
+    ],
     "import/prefer-default-export": "off",
     "import/no-extraneous-dependencies": "off",
+    "no-unused-vars": "off",
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     quotes: [2, "single"],
