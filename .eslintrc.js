@@ -7,7 +7,7 @@ module.exports = {
     "@typescript-eslint/naming-convention": "off",
     "@typescript-eslint/no-empty-function": "off",
     '@typescript-eslint/no-unused-vars': [
-      'warn',
+      'error',
       { 
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
