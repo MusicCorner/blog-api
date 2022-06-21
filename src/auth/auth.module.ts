@@ -8,8 +8,8 @@ import { User } from '@users/user.entity';
 import { AuthController } from './auth.controller';
 import { Auth } from './auth.entity';
 import { AuthService } from './auth.service';
-import { LocalStrategy } from './auth.local-strategy';
-import { AuthJwtStrategy } from './auth.jwt-strategy';
+import { LocalStrategy } from './guard/auth.local-strategy';
+import { AuthJwtStrategy } from './guard/auth.jwt-strategy';
 
 @Module({
   controllers: [AuthController],

@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { User } from '@users/user.entity';
-import { PartialCommonGetFilter } from '@common/filter';
+import { PartialCommonGetFilter } from '@common/types/filter';
 
-import { CreatePostDto } from './create-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './post.entity';
 
 @Injectable()
@@ -17,10 +17,32 @@ export class PostsService {
     private usersRepository: Repository<User>
   ) {}
 
-  async create(post: CreatePostDto, userId: string) {
+  private async _handleUserById(userId: string) {
     const userEntity = await this.usersRepository.findOne({
       where: { id: userId },
     });
+
+    if (!userEntity) {
+      throw new Error('no such user');
+    }
+
+    return userEntity;
+  }
+
+  private async _handlePostById(userId: string, postId: string) {
+    const postEntity = await this.postsRepository.findOne({
+      where: { id: postId, user: { id: userId } },
+    });
+
+    if (!postEntity) {
+      throw new Error('no such post');
+    }
+
+    return postEntity;
+  }
+
+  async create(post: CreatePostDto, userId: string) {
+    const userEntity = await this._handleUserById(userId);
 
     if (!userEntity) {
       throw new Error('no such user');
@@ -38,21 +60,7 @@ export class PostsService {
   }
 
   async edit(post: CreatePostDto, userId: string, postId: string) {
-    const userEntity = await this.usersRepository.findOne({
-      where: { id: userId },
-    });
-
-    if (!userEntity) {
-      throw new Error('no such user');
-    }
-
-    const postEntity = await this.postsRepository.findOne({
-      where: { id: postId, user: { id: userId } },
-    });
-
-    if (!postEntity) {
-      throw new Error('no such post');
-    }
+    const postEntity = await this._handlePostById(userId, postId);
 
     postEntity.content = post.content;
     postEntity.title = post.title;
@@ -63,37 +71,42 @@ export class PostsService {
   }
 
   async delete(userId: string, postId: string) {
-    const userEntity = await this.usersRepository.findOne({
-      where: { id: userId },
-    });
-
-    if (!userEntity) {
-      throw new Error('no such user');
-    }
-
-    const postEntity = await this.postsRepository.findOne({
-      where: { id: postId, user: { id: userId } },
-    });
-
-    if (!postEntity) {
-      throw new Error('no such post');
-    }
+    const postEntity = await this._handlePostById(userId, postId);
 
     postEntity.remove();
 
-    return postEntity;
+    return true;
   }
 
-  findAll(userId: string, filter: PartialCommonGetFilter) {
+  // async vote(userId: string, voteType: 'like' | 'dislike') {
+
+  // }
+
+  async findAll(userId: string, filter: PartialCommonGetFilter) {
     const { page = 1, onPage = 10, sortBy = 'createdAt', sort } = filter;
     const skip = (page - 1) * onPage;
     const take = onPage;
 
-    return this.postsRepository.find({
+    const basicQueryParams = {
       where: { user: { id: userId } },
+    };
+
+    const posts = await this.postsRepository.find({
+      ...basicQueryParams,
       skip,
       take,
       order: { [sortBy]: sort },
     });
+
+    const count = await this.postsRepository.count(basicQueryParams);
+    const pagesCount = count < onPage ? 1 : +(count / onPage).toFixed();
+
+    return {
+      data: posts,
+      count,
+      pagesCount,
+      onPage: +onPage,
+      page: +page,
+    };
   }
 }

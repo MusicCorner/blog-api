@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 
-import { PartialCommonGetFilter } from '@common/filter';
+import { PartialCommonGetFilter } from '@common/types/filter';
 import { PostsService } from '@posts/posts.service';
 
 @Controller('users')

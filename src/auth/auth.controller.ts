@@ -10,9 +10,9 @@ import {
 import { Request as ExpressReqeust } from 'express';
 
 import { Auth } from './auth.entity';
-import { AuthLocalGuard } from './auth.local-guard';
 import { AuthRegistrationDto } from './auth.registerDto';
 import { AuthService } from './auth.service';
+import { AuthLocalGuard } from './guard/auth.local-guard';
 
 @Controller()
 export class AuthController {
