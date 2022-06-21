@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -19,14 +18,6 @@ import { PostsService } from './posts.service';
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
-
-  @UseGuards(AuthJwtGuard)
-  @Get()
-  getAllPosts(@Request() req: ExpressRequest) {
-    const user = req.user as AuthJwtVerificationResponse;
-
-    return this.postsService.findAll(user.id);
-  }
 
   @UseGuards(AuthJwtGuard)
   @Post()
