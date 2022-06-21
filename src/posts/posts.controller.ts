@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Request,
   Res,
   UseGuards,
@@ -27,10 +28,13 @@ export class PostsController {
     @Request() req: ExpressRequestWithJWTUser<unknown, unknown, CreatePostDto>,
     @Res() res: Response
   ) {
-    const { body: createPostDto, user } = req;
+    const {
+      body: postDto,
+      user: { id: userId },
+    } = req;
 
     try {
-      const data = await this.postsService.create(createPostDto, user.id || '');
+      const data = await this.postsService.create(postDto, userId || '');
 
       res.status(HttpStatus.CREATED).send({ status: HttpStatus.CREATED, data });
     } catch (error) {
@@ -55,5 +59,22 @@ export class PostsController {
     await this.postsService.delete(userId, postId);
 
     res.status(HttpStatus.OK).send({ status: HttpStatus.OK, postId });
+  }
+
+  @UseGuards(AuthJwtGuard)
+  @Put(':postId')
+  async edit(
+    @Request() req: ExpressRequestWithJWTUser<unknown, unknown, CreatePostDto>,
+    @Res() res: Response,
+    @Param('postId') postId: string
+  ) {
+    const {
+      body: postDto,
+      user: { id: userId },
+    } = req;
+
+    const data = await this.postsService.edit(postDto, userId, postId);
+
+    res.status(HttpStatus.OK).send({ status: HttpStatus.OK, data });
   }
 }
