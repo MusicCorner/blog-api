@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Post } from '@posts/post.entity';
 import { PostsService } from '@posts/posts.service';
-import { PostsUsersVotes } from '@postsUsersVotes/postsUsersVotes.entity';
-import { PostsUsersVotesService } from '@postsUsersVotes/postsUsersVotes.service';
+import { PostsUsersVotes } from '@posts-users-votes/posts-users-votes.entity';
+import { PostsUsersVotesService } from '@posts-users-votes/posts-users-votes.service';
 
 import { User } from './user.entity';
 import { UsersController } from './users.controller';

@@ -1,18 +1,10 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
-import { PostsUsersVotes } from '@postsUsersVotes/postsUsersVotes.entity';
+import { PostsUsersVotes } from '@posts-users-votes/posts-users-votes.entity';
+import { BaseExtendedEntity } from '@common/entities/baseExtendedEntity';
 
 @Entity()
-export class User extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class User extends BaseExtendedEntity {
   @Column()
   firstName: string;
 
@@ -22,13 +14,9 @@ export class User extends BaseEntity {
   @Column()
   email: string;
 
-  @Column({ default: '' })
+  @Column({ default: '', unique: true })
   nickname?: string;
 
-  @OneToMany(
-    () => PostsUsersVotes,
-    (postsUsersVotes) => postsUsersVotes.user
-    // { cascade: true }
-  )
+  @OneToMany(() => PostsUsersVotes, (postsUsersVotes) => postsUsersVotes.user)
   postsUsersVotes: PostsUsersVotes;
 }

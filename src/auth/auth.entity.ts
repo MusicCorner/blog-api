@@ -1,19 +1,10 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 
 import { User } from '@users/user.entity';
+import { BaseExtendedEntity } from '@common/entities/baseExtendedEntity';
 
 @Entity()
-export class Auth extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class Auth extends BaseExtendedEntity {
   @OneToOne((_type) => User, { cascade: true })
   @JoinColumn()
   user: User;

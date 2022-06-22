@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { PostsUsersVotes } from '@postsUsersVotes/postsUsersVotes.entity';
-import { PostsUsersVotesService } from '@postsUsersVotes/postsUsersVotes.service';
+import { PostsUsersVotes } from '@posts-users-votes/posts-users-votes.entity';
+import { PostsUsersVotesService } from '@posts-users-votes/posts-users-votes.service';
 import { User } from '@users/user.entity';
 
 import { Post } from './post.entity';

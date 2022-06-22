@@ -1,21 +1,11 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 import { User } from '@users/user.entity';
-import { PostsUsersVotes } from '@postsUsersVotes/postsUsersVotes.entity';
+import { PostsUsersVotes } from '@posts-users-votes/posts-users-votes.entity';
+import { BaseExtendedEntity } from '@common/entities/baseExtendedEntity';
 
 @Entity()
-export class Post extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class Post extends BaseExtendedEntity {
   @ManyToOne((_type) => User)
   @JoinColumn()
   user: User;
@@ -32,16 +22,6 @@ export class Post extends BaseEntity {
   @Column({ default: 0 })
   dislikes?: number;
 
-  @Column({ default: new Date() })
-  createdAt?: Date;
-
-  @Column({ default: new Date() })
-  updatedAt?: Date;
-
-  @OneToMany(
-    () => PostsUsersVotes,
-    (postsUsersVotes) => postsUsersVotes.post
-    // { cascade: true }
-  )
+  @OneToMany(() => PostsUsersVotes, (postsUsersVotes) => postsUsersVotes.post)
   postsUsersVotes: PostsUsersVotes;
 }

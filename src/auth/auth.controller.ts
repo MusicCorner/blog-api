@@ -10,7 +10,7 @@ import {
 import { Request as ExpressReqeust } from 'express';
 
 import { Auth } from './auth.entity';
-import { AuthRegistrationDto } from './auth.registerDto';
+import { AuthRegistrationDto } from './dto/auth.register-dto';
 import { AuthService } from './auth.service';
 import { AuthLocalGuard } from './guard/auth.local-guard';
 

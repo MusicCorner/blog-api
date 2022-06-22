@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Post } from '@posts/post.entity';
 import { User } from '@users/user.entity';
 
-import { PostsUsersVotes } from './postsUsersVotes.entity';
+import { PostsUsersVotes } from './posts-users-votes.entity';
 
 @Injectable()
 export class PostsUsersVotesService {
