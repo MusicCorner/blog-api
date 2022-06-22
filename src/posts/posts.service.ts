@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 import { User } from '@users/user.entity';
 import { PartialCommonGetFilter } from '@common/types/filter';
+import { PostsUsersVotesService } from '@postsUsersVotes/postsUsersVotes.service';
 
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './post.entity';
@@ -14,7 +15,8 @@ export class PostsService {
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
     @InjectRepository(User)
-    private usersRepository: Repository<User>
+    private usersRepository: Repository<User>,
+    private postsUsersVotesService: PostsUsersVotesService
   ) {}
 
   private async _handleUserById(userId: string) {
@@ -73,14 +75,27 @@ export class PostsService {
   async delete(userId: string, postId: string) {
     const postEntity = await this._handlePostById(userId, postId);
 
-    postEntity.remove();
+    postEntity.softRemove();
 
     return true;
   }
 
-  // async vote(userId: string, voteType: 'like' | 'dislike') {
+  async vote(voteType: 'like' | 'dislike', userId: string, postId: string) {
+    const { dislike = 0, like = 0 } = await this.postsUsersVotesService.vote(
+      voteType,
+      userId,
+      postId
+    );
 
-  // }
+    const postEntity = await this._handlePostById(userId, postId);
+
+    postEntity.dislikes = dislike + (postEntity.dislikes || 0);
+    postEntity.likes = like + (postEntity.likes || 0);
+
+    Post.save(postEntity);
+
+    return postEntity;
+  }
 
   async findAll(userId: string, filter: PartialCommonGetFilter) {
     const { page = 1, onPage = 10, sortBy = 'createdAt', sort } = filter;

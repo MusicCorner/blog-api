@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
+import { PostsUsersVotes } from '@postsUsersVotes/postsUsersVotes.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -16,4 +24,11 @@ export class User extends BaseEntity {
 
   @Column({ default: '' })
   nickname?: string;
+
+  @OneToMany(
+    () => PostsUsersVotes,
+    (postsUsersVotes) => postsUsersVotes.user
+    // { cascade: true }
+  )
+  postsUsersVotes: PostsUsersVotes;
 }

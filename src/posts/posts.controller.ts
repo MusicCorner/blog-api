@@ -77,4 +77,21 @@ export class PostsController {
 
     res.status(HttpStatus.OK).send({ status: HttpStatus.OK, data });
   }
+
+  @UseGuards(AuthJwtGuard)
+  @Put(':postId/:voteType')
+  async vote(
+    @Request() req: ExpressRequestWithJWTUser<unknown, unknown, CreatePostDto>,
+    @Res() res: Response,
+    @Param('postId') postId: string,
+    @Param('voteType') voteType: 'like' | 'dislike'
+  ) {
+    const {
+      user: { id: userId },
+    } = req;
+
+    const data = await this.postsService.vote(voteType, userId, postId);
+
+    res.status(HttpStatus.OK).send({ status: HttpStatus.OK, data });
+  }
 }

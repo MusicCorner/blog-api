@@ -4,10 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { User } from '@users/user.entity';
+import { PostsUsersVotes } from '@postsUsersVotes/postsUsersVotes.entity';
 
 @Entity()
 export class Post extends BaseEntity {
@@ -35,4 +37,11 @@ export class Post extends BaseEntity {
 
   @Column({ default: new Date() })
   updatedAt?: Date;
+
+  @OneToMany(
+    () => PostsUsersVotes,
+    (postsUsersVotes) => postsUsersVotes.post
+    // { cascade: true }
+  )
+  postsUsersVotes: PostsUsersVotes;
 }
