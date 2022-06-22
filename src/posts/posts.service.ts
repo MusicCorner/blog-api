@@ -4,6 +4,7 @@ import { Like, Repository } from 'typeorm';
 
 import { User } from '@users/user.entity';
 import { PostsUsersVotesService } from '@posts-users-votes/posts-users-votes.service';
+import { Comment } from '@comments/comments.entity';
 
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './post.entity';
@@ -16,6 +17,8 @@ export class PostsService {
     private postsRepository: Repository<Post>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(User)
+    private commentsRepository: Repository<Comment>,
     private postsUsersVotesService: PostsUsersVotesService
   ) {}
 
@@ -45,10 +48,6 @@ export class PostsService {
 
   async create(post: CreatePostDto, userId: string) {
     const userEntity = await this._handleUserById(userId);
-
-    if (!userEntity) {
-      throw new Error('no such user');
-    }
 
     const postEntity = this.postsRepository.create();
 
@@ -95,6 +94,51 @@ export class PostsService {
     Post.save(postEntity);
 
     return postEntity;
+  }
+
+  async addPostComment(content: string, userId: string, postId: string) {
+    const commentEntity = this.commentsRepository.create();
+    const userEntity = await this._handleUserById(userId);
+
+    commentEntity.content = content;
+    commentEntity.user = userEntity;
+
+    const postEntity = await this._handlePostById(userId, postId);
+
+    commentEntity.post = postEntity;
+
+    return Comment.save(commentEntity);
+  }
+
+  async editPostComment(
+    content: string,
+    commentId: string,
+    userId: string,
+    postId: string
+  ) {
+    const commentEntity = await this.commentsRepository.findOne({
+      where: { id: commentId, user: { id: userId }, post: { id: postId } },
+    });
+
+    if (!commentEntity) {
+      throw new Error('no such comment');
+    }
+
+    commentEntity.content = content;
+
+    return Comment.save(commentEntity);
+  }
+
+  async deletePostComment(commentId: string, userId: string, postId: string) {
+    const commentEntity = await this.commentsRepository.findOne({
+      where: { id: commentId, user: { id: userId }, post: { id: postId } },
+    });
+
+    if (!commentEntity) {
+      throw new Error('no such comment');
+    }
+
+    return commentEntity.softRemove();
   }
 
   async findAll(filter: FindPostsDto) {
