@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 import { User } from '@users/user.entity';
-import { PartialCommonGetFilter } from '@common/types/filter';
 import { PostsUsersVotesService } from '@postsUsersVotes/postsUsersVotes.service';
 
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './post.entity';
+import { FindPostsDto } from './dto/find-posts.dto';
 
 @Injectable()
 export class PostsService {
@@ -97,23 +97,32 @@ export class PostsService {
     return postEntity;
   }
 
-  async findAll(userId: string, filter: PartialCommonGetFilter) {
-    const { page = 1, onPage = 10, sortBy = 'createdAt', sort } = filter;
+  async findAll(filter: FindPostsDto) {
+    const {
+      page = 1,
+      onPage = 10,
+      sortBy = 'createdAt',
+      sort,
+      userId = '',
+      keywords = '',
+    } = filter;
     const skip = (page - 1) * onPage;
     const take = onPage;
 
-    const basicQueryParams = {
-      where: { user: { id: userId } },
+    const whereParam = {
+      user: userId ? { id: userId } : {},
+      title: Like(`%${keywords}%`),
+      content: Like(`%${keywords}%`),
     };
 
     const posts = await this.postsRepository.find({
-      ...basicQueryParams,
+      where: whereParam,
       skip,
       take,
       order: { [sortBy]: sort },
     });
 
-    const count = await this.postsRepository.count(basicQueryParams);
+    const count = await this.postsRepository.count({ where: whereParam });
     const pagesCount = count < onPage ? 1 : +(count / onPage).toFixed();
 
     return {

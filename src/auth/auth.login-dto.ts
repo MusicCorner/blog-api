@@ -1,5 +1,4 @@
-export class AuthLoginDto {
+export interface AuthLoginDto {
   login: string;
-
   password: string;
 }

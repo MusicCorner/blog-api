@@ -1,11 +1,13 @@
 import {
   Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
   Param,
   Post,
   Put,
+  Query,
   Request,
   Res,
   UseGuards,
@@ -14,6 +16,7 @@ import { Response } from 'express';
 
 import { AuthJwtGuard } from '@auth/guard/auth.jwt-guard';
 import { ExpressRequestWithJWTUser } from '@common/types/express';
+import { PartialCommonGetFilter } from '@common/types/filter';
 
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
@@ -21,6 +24,11 @@ import { PostsService } from './posts.service';
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
+
+  @Get()
+  getAllPosts(@Query() queryParams: PartialCommonGetFilter) {
+    return this.postsService.findAll(queryParams);
+  }
 
   @UseGuards(AuthJwtGuard)
   @Post()

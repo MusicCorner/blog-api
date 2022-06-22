@@ -12,6 +12,6 @@ export class UsersController {
     @Query() queryParams: PartialCommonGetFilter,
     @Param('userId') userId: string
   ) {
-    return this.postsService.findAll(userId, queryParams);
+    return this.postsService.findAll({ ...queryParams, userId });
   }
 }
