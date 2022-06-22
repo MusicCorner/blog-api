@@ -109,13 +109,13 @@ export class PostsService {
     const skip = (page - 1) * onPage;
     const take = onPage;
 
-    const whereParam = {
-      user: userId ? { id: userId } : {},
-      title: Like(`%${keywords}%`),
-      content: Like(`%${keywords}%`),
-    };
+    const whereParam = [
+      { user: userId ? { id: userId } : {} },
+      { title: Like(`%${keywords.toLowerCase()}%`) },
+      { content: Like(`%${keywords.toLowerCase()}%`) },
+    ];
 
-    const posts = await this.postsRepository.find({
+    const data = await this.postsRepository.find({
       where: whereParam,
       skip,
       take,
@@ -126,7 +126,7 @@ export class PostsService {
     const pagesCount = count < onPage ? 1 : +(count / onPage).toFixed();
 
     return {
-      data: posts,
+      data,
       count,
       pagesCount,
       onPage: +onPage,
