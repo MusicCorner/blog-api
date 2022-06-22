@@ -9,7 +9,10 @@ import { Comment } from '@comments/comments.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from './post.entity';
 import { FindPostsDto } from './dto/find-posts.dto';
+import { AddCommentDto } from './dto/add-comment.dto';
+import { GetCommentsDto } from './dto/get-comments.dto';
 
+// TODO: get rid of the copypasta for "get" services methods
 @Injectable()
 export class PostsService {
   constructor(
@@ -17,7 +20,7 @@ export class PostsService {
     private postsRepository: Repository<Post>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(User)
+    @InjectRepository(Comment)
     private commentsRepository: Repository<Comment>,
     private postsUsersVotesService: PostsUsersVotesService
   ) {}
@@ -96,7 +99,39 @@ export class PostsService {
     return postEntity;
   }
 
-  async addPostComment(content: string, userId: string, postId: string) {
+  async getComments(filter: GetCommentsDto) {
+    const {
+      page = 1,
+      onPage = 10,
+      sortBy = 'createdAt',
+      sort,
+      postId,
+    } = filter;
+    const skip = (page - 1) * onPage;
+    const take = onPage;
+
+    const where = { post: { id: postId } };
+
+    const data = await this.commentsRepository.find({
+      where,
+      skip,
+      take,
+      order: { [sortBy]: sort },
+    });
+
+    const count = await this.commentsRepository.count({ where });
+    const pagesCount = count < onPage ? 1 : +(count / onPage).toFixed();
+
+    return {
+      data,
+      count,
+      pagesCount,
+      onPage: +onPage,
+      page: +page,
+    };
+  }
+
+  async addComment({ content }: AddCommentDto, userId: string, postId: string) {
     const commentEntity = this.commentsRepository.create();
     const userEntity = await this._handleUserById(userId);
 
@@ -108,37 +143,6 @@ export class PostsService {
     commentEntity.post = postEntity;
 
     return Comment.save(commentEntity);
-  }
-
-  async editPostComment(
-    content: string,
-    commentId: string,
-    userId: string,
-    postId: string
-  ) {
-    const commentEntity = await this.commentsRepository.findOne({
-      where: { id: commentId, user: { id: userId }, post: { id: postId } },
-    });
-
-    if (!commentEntity) {
-      throw new Error('no such comment');
-    }
-
-    commentEntity.content = content;
-
-    return Comment.save(commentEntity);
-  }
-
-  async deletePostComment(commentId: string, userId: string, postId: string) {
-    const commentEntity = await this.commentsRepository.findOne({
-      where: { id: commentId, user: { id: userId }, post: { id: postId } },
-    });
-
-    if (!commentEntity) {
-      throw new Error('no such comment');
-    }
-
-    return commentEntity.softRemove();
   }
 
   async findAll(filter: FindPostsDto) {

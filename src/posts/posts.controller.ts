@@ -20,13 +20,14 @@ import { PartialCommonGetFilter } from '@common/types/filter';
 
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
+import { AddCommentDto } from './dto/add-comment.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
 
   @Get()
-  getAllPosts(@Query() queryParams: PartialCommonGetFilter) {
+  get(@Query() queryParams: PartialCommonGetFilter) {
     return this.postsService.findAll(queryParams);
   }
 
@@ -101,5 +102,42 @@ export class PostsController {
     const data = await this.postsService.vote(voteType, userId, postId);
 
     res.status(HttpStatus.OK).send({ status: HttpStatus.OK, data });
+  }
+
+  @Get(':postId/comments')
+  getComments(
+    @Param('postId') postId: string,
+    @Query() queryParams: PartialCommonGetFilter
+  ) {
+    return this.postsService.getComments({ ...queryParams, postId });
+  }
+
+  @UseGuards(AuthJwtGuard)
+  @Post(':postId/comments')
+  async addComment(
+    @Param('postId') postId: string,
+    @Request() req: ExpressRequestWithJWTUser<unknown, unknown, AddCommentDto>,
+    @Res() res: Response
+  ) {
+    const {
+      body: createCommentDto,
+      user: { id: userId },
+    } = req;
+
+    try {
+      const data = await this.postsService.addComment(
+        createCommentDto,
+        userId || '',
+        postId
+      );
+
+      res.status(HttpStatus.CREATED).send({ status: HttpStatus.CREATED, data });
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'Something went wrong',
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }
