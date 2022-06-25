@@ -13,15 +13,15 @@ export class UsersController {
   ) {}
 
   @Get()
-  getUsers(@Query() filter: PartialCommonGetFilter) {
-    return this.usersService.findAll(filter);
+  get(@Query() filter: PartialCommonGetFilter) {
+    return this.usersService.get(filter);
   }
 
   @Get(':userId/posts')
-  getAllPosts(
+  getPosts(
     @Query() filter: PartialCommonGetFilter,
     @Param('userId') userId: string
   ) {
-    return this.postsService.findAll({ ...filter, userId });
+    return this.postsService.get({ ...filter, userId });
   }
 }

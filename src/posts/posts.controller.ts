@@ -30,7 +30,7 @@ export class PostsController {
 
   @Get()
   get(@Query() queryParams: PartialCommonGetFilter) {
-    return this.postsService.findAll(queryParams);
+    return this.postsService.get(queryParams);
   }
 
   @UseGuards(AuthJwtGuard)
@@ -49,7 +49,6 @@ export class PostsController {
 
       res.status(HttpStatus.CREATED).send({ status: HttpStatus.CREATED, data });
     } catch (error) {
-      console.error(error);
       throw new HttpException(
         'Something went wrong',
         HttpStatus.INTERNAL_SERVER_ERROR

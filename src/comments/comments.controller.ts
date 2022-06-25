@@ -42,7 +42,6 @@ export class CommentsController {
 
       res.status(HttpStatus.CREATED).send({ status: HttpStatus.CREATED, data });
     } catch (error) {
-      console.error(error);
       throw new HttpException(
         'Something went wrong',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -66,7 +65,6 @@ export class CommentsController {
 
       res.status(HttpStatus.CREATED).send({ status: HttpStatus.CREATED, data });
     } catch (error) {
-      console.error(error);
       throw new HttpException(
         'Something went wrong',
         HttpStatus.INTERNAL_SERVER_ERROR

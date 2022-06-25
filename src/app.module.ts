@@ -15,7 +15,6 @@ import { CommentsModule } from '@comments/comments.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB_NAME,
-      // entities: [Post],
       autoLoadEntities: true,
     }),
     AuthModule,
