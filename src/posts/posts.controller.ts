@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -18,9 +19,10 @@ import { AuthJwtGuard } from '@auth/guard/auth.jwt-guard';
 import { ExpressRequestWithJWTUser } from '@common/types/express';
 import { PartialCommonGetFilter } from '@common/types/filter';
 
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreatePostDto, PostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
 import { AddCommentDto } from './dto/add-comment.dto';
+import { PostIdDto } from './dto/post-id.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -34,11 +36,11 @@ export class PostsController {
   @UseGuards(AuthJwtGuard)
   @Post()
   async create(
+    @Body() postDto: PostDto,
     @Request() req: ExpressRequestWithJWTUser<unknown, unknown, CreatePostDto>,
     @Res() res: Response
   ) {
     const {
-      body: postDto,
       user: { id: userId },
     } = req;
 
@@ -60,7 +62,7 @@ export class PostsController {
   async delete(
     @Request() req: ExpressRequestWithJWTUser,
     @Res() res: Response,
-    @Param('postId') postId: string
+    @Param() { postId }: PostIdDto
   ) {
     const {
       user: { id: userId },
@@ -73,12 +75,12 @@ export class PostsController {
   @UseGuards(AuthJwtGuard)
   @Put(':postId')
   async edit(
+    @Body() postDto: CreatePostDto,
     @Request() req: ExpressRequestWithJWTUser<unknown, unknown, CreatePostDto>,
     @Res() res: Response,
     @Param('postId') postId: string
   ) {
     const {
-      body: postDto,
       user: { id: userId },
     } = req;
 
@@ -92,8 +94,7 @@ export class PostsController {
   async vote(
     @Request() req: ExpressRequestWithJWTUser<unknown, unknown, CreatePostDto>,
     @Res() res: Response,
-    @Param('postId') postId: string,
-    @Param('voteType') voteType: 'like' | 'dislike'
+    @Param() { postId, voteType }: PostIdDto & { voteType: 'like' | 'dislike' }
   ) {
     const {
       user: { id: userId },
@@ -106,7 +107,7 @@ export class PostsController {
 
   @Get(':postId/comments')
   getComments(
-    @Param('postId') postId: string,
+    @Param() { postId }: PostIdDto,
     @Query() queryParams: PartialCommonGetFilter
   ) {
     return this.postsService.getComments({ ...queryParams, postId });
@@ -115,12 +116,12 @@ export class PostsController {
   @UseGuards(AuthJwtGuard)
   @Post(':postId/comments')
   async addComment(
-    @Param('postId') postId: string,
+    @Param() { postId }: PostIdDto,
+    @Body() createCommentDto: AddCommentDto,
     @Request() req: ExpressRequestWithJWTUser<unknown, unknown, AddCommentDto>,
     @Res() res: Response
   ) {
     const {
-      body: createCommentDto,
       user: { id: userId },
     } = req;
 
@@ -133,7 +134,6 @@ export class PostsController {
 
       res.status(HttpStatus.CREATED).send({ status: HttpStatus.CREATED, data });
     } catch (error) {
-      console.error(error);
       throw new HttpException(
         'Something went wrong',
         HttpStatus.INTERNAL_SERVER_ERROR

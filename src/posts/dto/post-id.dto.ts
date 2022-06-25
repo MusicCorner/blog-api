@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class AddCommentDto {
+export class PostIdDto {
   @IsNotEmpty()
-  content: string;
+  postId: string;
 }
