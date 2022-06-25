@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 
 import { User } from '@users/user.entity';
+import { compareHashWithText, generateHash } from '@common/helpers/hash';
 
 import { Auth } from './auth.entity';
 import { AuthLoginDto } from './dto/auth.login-dto';
@@ -17,11 +18,26 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  validateUser(authData: AuthLoginDto) {
-    return this.authRepository.findOne({
-      where: authData,
+  async validateUser({ login, password }: AuthLoginDto) {
+    const user = await this.authRepository.findOne({
+      where: { login },
       relations: ['user'],
     });
+
+    if (!user) {
+      throw new UnprocessableEntityException();
+    }
+
+    const isPasswordCorrect = await compareHashWithText(
+      password,
+      user.password
+    );
+
+    if (!isPasswordCorrect) {
+      throw new UnprocessableEntityException();
+    }
+
+    return user;
   }
 
   login(authData: Auth) {
@@ -33,7 +49,7 @@ export class AuthService {
     };
   }
 
-  registerUser(registrationData: AuthRegistrationDto) {
+  async registerUser(registrationData: AuthRegistrationDto) {
     const { login, password, email, firstName, lastName, nickname } =
       registrationData;
 
@@ -47,7 +63,7 @@ export class AuthService {
     const auth = this.authRepository.create();
 
     auth.login = login;
-    auth.password = password;
+    auth.password = await generateHash(password);
     auth.user = user;
 
     return this.authRepository.save(auth);
