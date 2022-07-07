@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
+    "start:prod": "nodemon -r dotenv_config_path=./dotenv/prod.env",
     "start:dev": "nodemon -r dotenv_config_path=./dotenv/dev.env",
     "typeorm": "ts-node ./node_modules/.bin/typeorm",
     "migration:generate": "yarn run typeorm migration:generate src/migrations/migration -d src/config/ormconfig.ts",
     "migration:create": "yarn run typeorm migration:create src/migrations/migration -d src/config/ormconfig.ts",
-    "migration:run": "yarn run typeorm migration:run -d src/config/ormconfig.ts",
+    "migration:run": "NODE_ENV=example yarn run typeorm migration:run -d src/config/ormconfig.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts",
     "lint-fix": "yarn lint --fix",
