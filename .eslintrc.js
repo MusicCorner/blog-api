@@ -19,6 +19,7 @@ module.exports = {
     "no-unused-vars": "off",
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
+    "no-console": "error",
     quotes: [2, "single"],
     "prettier/prettier": [
       "error",
