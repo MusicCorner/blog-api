@@ -3,30 +3,59 @@ services:
   web:
     build:
       context: .
-      # target: dev
+
+      args:
+        NODE_ENV: "${NODE_ENV}"
+        NODE_WORKDIR: "${NODE_WORKDIR}"
+
     volumes:
-      - ./:/usr/src/app
+      - ./:${NODE_WORKDIR}
     ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: development
+      - "${NODE_PORT}:${NODE_PORT}"
 
   db:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: blog
-    # command: "CREATE DATABASE blog"
-    expose:
-      - 5433
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB_NAME}"
+
     ports:
-      - '5433:5432'
+      - "${POSTGRES_DB_OUTER_PORT}:${POSTGRES_DB_INNER_PORT}"
     volumes:
       - db:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  web-prod:
+    build:
+      context: .
+
+      args:
+        NODE_ENV: "${NODE_ENV}"
+        NODE_WORKDIR: "${NODE_WORKDIR}"
+
+    volumes:
+      - ./:${NODE_WORKDIR}
+    ports:
+      - "${NODE_PORT}:${NODE_PORT}"
+
+  db-prod:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB_NAME}"
+
+    ports:
+      - "${POSTGRES_DB_OUTER_PORT}:${POSTGRES_DB_INNER_PORT}"
+    volumes:
+      - db-production:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    command: -p ${POSTGRES_DB_INNER_PORT}
+
 volumes:
-  db:
-    driver: local
+  db: {}
+  db-production: {}

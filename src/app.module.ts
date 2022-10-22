@@ -10,8 +10,8 @@ import { CommentsModule } from '@comments/comments.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'db',
-      port: +(process.env.POSTGRES_PORT || 0),
+      host: process.env.NODE_POSTGRES_HOST,
+      port: +(process.env.POSTGRES_DB_INNER_PORT || 0),
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB_NAME,

@@ -1,12 +1,13 @@
-# CMD ["./prune.sh"]
-
 FROM node:16.15-alpine3.14 as blog-node
-ENV NODE_ENV=development
-WORKDIR /usr/src/app
-# RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
+
+ARG NODE_ENV
+ARG NODE_WORKDIR
+ENV NODE_ENV ${NODE_ENV}
+ENV NODE_WORKDIR ${NODE_WORKDIR}
+WORKDIR ${NODE_WORKDIR}
+
 COPY package*.json ./
-RUN yarn
+RUN yarn install --production
 COPY . .
-# RUN yarn migration:run
 EXPOSE 3000
-CMD yarn start:dev
+CMD yarn start-node-server:${NODE_ENV}

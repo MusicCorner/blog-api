@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { FindManyOptions, FindOptionsOrder, Repository } from 'typeorm';
+import {
+  FindManyOptions,
+  FindOptionsOrder,
+  ObjectLiteral,
+  Repository,
+} from 'typeorm';
 
 import { PartialCommonGetFilter } from '@common/types/filter';
 
 @Injectable()
 export class CommonRepositoryService {
-  async findRepositoryDataWithCommonFilter<R>(
+  async findRepositoryDataWithCommonFilter<R extends ObjectLiteral>(
     repository: Repository<R>,
     filter: PartialCommonGetFilter,
     findOptions?: FindManyOptions<R>
