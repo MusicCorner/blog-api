@@ -46,19 +46,18 @@ export class AuthService {
         login: authData.login,
         id: authData.user.id,
       }),
+      ...authData.user,
     };
   }
 
   async registerUser(registrationData: AuthRegistrationDto) {
-    const { login, password, email, firstName, lastName, nickname } =
-      registrationData;
+    const { password, email, firstName, lastName, login } = registrationData;
 
     const user = this.userRepository.create();
 
     user.email = email;
     user.firstName = firstName;
     user.lastName = lastName;
-    user.nickname = nickname;
 
     const auth = this.authRepository.create();
 
@@ -66,6 +65,8 @@ export class AuthService {
     auth.password = await generateHash(password);
     auth.user = user;
 
-    return this.authRepository.save(auth);
+    const userData = await this.authRepository.save(auth);
+
+    return this.login(userData);
   }
 }

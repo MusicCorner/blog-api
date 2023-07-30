@@ -13,8 +13,6 @@ export class AuthRegistrationDto {
   @IsNotEmpty()
   lastName: string;
 
-  nickname?: string;
-
   @IsNotEmpty()
   email: string;
 }

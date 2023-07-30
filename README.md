@@ -13,4 +13,5 @@
 
 ## Development
 ### Migrations and entities
-After changing entities (typeorm models) - generate migrations with `yarn migration-generate:${ENV}` in docker web (node js) container and run those migrations with `yarn migration-run:${ENV}`
+*Run all commands in node js docker container terminal*  
+After changing entities (typeorm models) - generate migrations with `yarn migration-generate:${ENV}` Run those migrations with `yarn migration-run:${ENV}`

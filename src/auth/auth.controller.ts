@@ -27,9 +27,7 @@ export class AuthController {
   @Post('/auth/signup')
   async signUp(@Body() body: AuthRegistrationDto) {
     try {
-      const authData = await this.authService.registerUser(body);
-
-      return authData.user;
+      return await this.authService.registerUser(body);
     } catch (_error) {
       const error = _error as { code: string };
 

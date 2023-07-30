@@ -11,11 +11,8 @@ export class User extends BaseExtendedEntity {
   @Column()
   lastName: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
-
-  @Column({ default: '', unique: true })
-  nickname?: string;
 
   @OneToMany(() => PostsUsersVotes, (postsUsersVotes) => postsUsersVotes.user)
   postsUsersVotes: PostsUsersVotes;
