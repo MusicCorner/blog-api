@@ -12,10 +12,15 @@ import { PartialCommonGetFilter } from '@common/types/filter';
 export class CommonRepositoryService {
   async findRepositoryDataWithCommonFilter<R extends ObjectLiteral>(
     repository: Repository<R>,
-    filter: PartialCommonGetFilter,
+    filter?: PartialCommonGetFilter,
     findOptions?: FindManyOptions<R>
   ) {
-    const { page = 1, onPage = 10, sortBy = 'createdAt', sort } = filter;
+    const {
+      page = 1,
+      onPage = 10,
+      sortBy = 'createdAt',
+      sort = 'asc',
+    } = filter || {};
     const skip = (page - 1) * onPage;
     const take = onPage;
 

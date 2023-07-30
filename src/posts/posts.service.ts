@@ -12,6 +12,7 @@ import { Post } from './post.entity';
 import { FindPostsDto } from './dto/find-posts.dto';
 import { AddCommentDto } from './dto/add-comment.dto';
 import { GetCommentsDto } from './dto/get-comments.dto';
+import { GetPostFormatted, GetPostRaw } from './post.types';
 
 @Injectable()
 export class PostsService {
@@ -86,11 +87,83 @@ export class PostsService {
       where = undefined;
     }
 
-    return this.repositoryService.findRepositoryDataWithCommonFilter(
-      this.postsRepository,
-      restFilter,
-      { where, relations: ['user'] }
+    const query = this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'postUser')
+      .leftJoinAndSelect(
+        (qb) =>
+          qb
+            .select(
+              'content AS comment_content, "postId", id AS comment_id, "userId"'
+            )
+            .from(Comment, 'comments')
+            .limit(5),
+        'comment',
+        'comment."postId" = post.id'
+      )
+      .leftJoinAndSelect(
+        (qb) =>
+          qb
+            .select(
+              `
+              "firstName" as "comment_user_firstName",
+              "lastName" as "comment_user_lastName",
+              id as comment_user_id,
+              email as comment_user_email,
+              "createdAt" as "comment_user_createdAt"
+              `
+            )
+            .from(User, 'user'),
+        'comment_user',
+        'comment_user.comment_user_id = comment."userId"'
+      );
+
+    if (where) {
+      query.where(where);
+    }
+
+    const rawData = (await query.getRawMany()) as unknown as GetPostRaw[];
+
+    const postsWithComments = rawData.reduce(
+      (accum, post) => ({
+        ...accum,
+        [post.post_id]: {
+          id: post.post_id,
+          title: post.post_title,
+          content: post.post_content,
+          createdAt: post.post_createdAt,
+          updatedAt: post.post_updatedAt,
+          likes: post.post_likes,
+          dislikes: post.post_dislikes,
+          user: {
+            firstName: post.postUser_firstName,
+            lastName: post.postUser_firstName,
+            id: post.postUser_id,
+            email: post.postUser_email,
+            createdAt: post.postUser_createdAt,
+          },
+          comments: [
+            ...(accum?.[post.post_id as keyof typeof accum]?.comments || []),
+            post.comment_id && {
+              content: post.comment_content,
+              id: post.comment_id,
+              user: {
+                id: post.comment_user_id,
+                firstName: post.comment_user_firstName,
+                lastName: post.comment_user_lastName,
+                email: post.comment_user_email,
+                createdAt: post.comment_user_createdAt,
+              },
+            },
+          ].filter(Boolean),
+        } as GetPostFormatted,
+      }),
+      {} as { [key: string]: GetPostFormatted }
     );
+
+    const data = Object.values(postsWithComments);
+
+    return { count: 10, data };
   }
 
   async create(post: CreatePostDto, userId: string) {
@@ -151,7 +224,7 @@ export class PostsService {
     return this.repositoryService.findRepositoryDataWithCommonFilter(
       this.commentsRepository,
       restFilter,
-      { where }
+      { where, relations: ['user'] }
     );
   }
 
