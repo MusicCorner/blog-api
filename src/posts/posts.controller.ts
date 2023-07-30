@@ -23,13 +23,14 @@ import { CreatePostDto, PostDto } from './dto/create-post.dto';
 import { PostsService } from './posts.service';
 import { AddCommentDto } from './dto/add-comment.dto';
 import { PostIdDto } from './dto/post-id.dto';
+import { FindPostsDto } from './dto/find-posts.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
 
   @Get()
-  get(@Query() queryParams: PartialCommonGetFilter) {
+  get(@Query() queryParams: FindPostsDto) {
     return this.postsService.get(queryParams);
   }
 
