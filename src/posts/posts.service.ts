@@ -64,7 +64,14 @@ export class PostsService {
   }
 
   async get(filter: FindPostsDto) {
-    const { userId, ...restFilter } = filter;
+    const {
+      userId,
+      sort,
+      sortBy,
+      page = 1,
+      onPage = 20,
+      ...restFilter
+    } = filter;
 
     let where: undefined | any[] = [];
 
@@ -87,8 +94,13 @@ export class PostsService {
       where = undefined;
     }
 
+    const limit = onPage;
+    const offset = (page - 1) * limit;
+
     const query = this.postsRepository
       .createQueryBuilder('post')
+      .limit(limit)
+      .offset(offset)
       .leftJoinAndSelect('post.user', 'postUser')
       .leftJoinAndSelect(
         (qb) =>
@@ -121,6 +133,16 @@ export class PostsService {
     if (where) {
       query.where(where);
     }
+
+    if (sort || sortBy) {
+      query.orderBy(
+        `post.${sortBy || 'createdAt'}`,
+        (sort?.toUpperCase() as 'ASC') || 'ASC'
+      );
+    }
+
+    const count = await query.getCount();
+    const pagesCount = count < onPage ? 1 : +(count / onPage).toFixed();
 
     const rawData = (await query.getRawMany()) as unknown as GetPostRaw[];
 
@@ -163,7 +185,7 @@ export class PostsService {
 
     const data = Object.values(postsWithComments);
 
-    return { count: 10, data };
+    return { count, pagesCount, onPage: +onPage, page: +page, data };
   }
 
   async create(post: CreatePostDto, userId: string) {
