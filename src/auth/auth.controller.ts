@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -9,19 +10,40 @@ import {
 } from '@nestjs/common';
 import { Request as ExpressReqeust } from 'express';
 
+import { UsersService } from '@users/users.service';
+
 import { Auth } from './auth.entity';
 import { AuthRegistrationDto } from './dto/auth.register-dto';
 import { AuthService } from './auth.service';
 import { AuthLocalGuard } from './guard/auth.local-guard';
+import { AuthJwtGuard } from './guard/auth.jwt-guard';
 
 @Controller()
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService
+  ) {}
 
   @UseGuards(AuthLocalGuard)
   @Post('/auth/signin')
   signIn(@Request() req: ExpressReqeust) {
     return this.authService.login(req.user as Auth);
+  }
+
+  @UseGuards(AuthJwtGuard)
+  @Get('/auth/check')
+  async getSelfData(@Request() req: ExpressReqeust) {
+    const { id } = (req.user || {}) as Auth;
+
+    try {
+      return await this.usersService.getById({ id });
+    } catch (error) {
+      throw new HttpException(
+        'User is not authorized',
+        HttpStatus.UNAUTHORIZED
+      );
+    }
   }
 
   @Post('/auth/signup')

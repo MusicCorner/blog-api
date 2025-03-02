@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 
 import { User } from '@users/user.entity';
+import { UsersService } from '@users/users.service';
+import { CommonRepositoryService } from '@common/common-repository.service';
 
 import { AuthController } from './auth.controller';
 import { Auth } from './auth.entity';
@@ -21,6 +23,12 @@ import { AuthJwtStrategy } from './guard/auth.jwt-strategy';
       signOptions: { expiresIn: '4h' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, AuthJwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    AuthJwtStrategy,
+    UsersService,
+    CommonRepositoryService,
+  ],
 })
 export class AuthModule {}
